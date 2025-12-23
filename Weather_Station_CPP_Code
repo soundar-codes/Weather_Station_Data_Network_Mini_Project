@@ -1,0 +1,75 @@
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+#include <queue>
+#include <stack>
+using namespace std;
+
+// Hash Table for stations (Location ID -> Station Name)
+unordered_map<string, string> stations;
+
+// Graph using adjacency list
+unordered_map<string, vector<string>> graph;
+
+// Queue for sensor data
+queue<string> sensorQueue;
+
+// Stack for undo operations
+stack<string> undoStack;
+
+// Add a weather station
+void addStation(string id, string name) {
+    stations[id] = name;
+    graph[id] = {};
+    undoStack.push(id);
+    cout << "Station added: " << name << endl;
+}
+
+// Connect two stations
+void connectStations(string a, string b) {
+    graph[a].push_back(b);
+    graph[b].push_back(a);
+    cout << "Stations connected" << endl;
+}
+
+// Add sensor data to queue
+void addSensorData(string data) {
+    sensorQueue.push(data);
+    cout << "Data added: " << data << endl;
+}
+
+// Process sensor data from queue
+void processSensorData() {
+    if (!sensorQueue.empty()) {
+        cout << "Processing: " << sensorQueue.front() << endl;
+        sensorQueue.pop();
+    } else {
+        cout << "No sensor data available" << endl;
+    }
+}
+
+// Undo last station addition
+void undo() {
+    if (!undoStack.empty()) {
+        string id = undoStack.top();
+        undoStack.pop();
+        stations.erase(id);
+        graph.erase(id);
+        cout << "Undo: Station removed" << endl;
+    }
+}
+
+int main() {
+    addStation("CBE01", "Coimbatore");
+    addStation("CHE01", "Chennai");
+
+    connectStations("CBE01", "CHE01");
+
+    addSensorData("Temperature: 30C");
+    addSensorData("Humidity: 60%");
+
+    processSensorData();
+
+    undo();
+    return 0;
+}
